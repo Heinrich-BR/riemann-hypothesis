@@ -17,21 +17,6 @@ open PowerSeries Formalism.G Formalism.LT Formalism.L2.Th1.CM
 section Field
 variable {K : Type} [Field K] (g2 g3 : K)
 
-theorem coeff_one_subst_of_constantCoeff_eq_zero (f g : PowerSeries K) (hg : constantCoeff g = 0) :
-    coeff 1 (f.subst g) = coeff 1 f * coeff 1 g := by
-  have hs : HasSubst g := HasSubst.of_constantCoeff_zero hg
-  have hX : X ∣ g := X_dvd_iff.mpr hg
-  rw [PowerSeries.coeff_subst' hs, finsum_eq_single _ 1]
-  · simp [smul_eq_mul]
-  · intro d hd
-    rcases Nat.lt_or_gt_of_ne hd with h | h
-    · have : d = 0 := by omega
-      subst this
-      simp
-    · have h2 : X ^ d ∣ g ^ d := pow_dvd_pow_of_dvd hX d
-      have h3 := X_pow_dvd_iff.mp h2 1 h
-      simp [h3]
-
 theorem uSer_const : constantCoeff (uSer g2 g3) = 0 := by
   unfold uSer
   rw [map_mul, map_mul, constantCoeff_X, zero_mul, zero_mul]
@@ -57,11 +42,6 @@ theorem uSer_subst_lgS : (uSer g2 g3).subst (lgS g2 g3) = X := by
   unfold lgS
   rw [dite_eq_left (exists_rightInverse_weierstrassExp g2 g3)]
   exact (exists_rightInverse_weierstrassExp g2 g3).choose_spec.2
-theorem lgS_coeff_one : coeff 1 (lgS g2 g3) = 1 := by
-  have h := congrArg (coeff 1) (uSer_subst_lgS g2 g3)
-  rw [coeff_one_subst_of_constantCoeff_eq_zero _ _ (lgS_const g2 g3), uSer_coeff_one, one_mul] at h
-  simpa using h
-
 theorem eq_substInv_of_rightInverse (t : PowerSeries K) (ht : constantCoeff t = 0)
     (h : (uSer g2 g3).subst t = X) :
     t = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) := by
@@ -72,10 +52,6 @@ theorem eq_substInv_of_rightInverse (t : PowerSeries K) (ht : constantCoeff t = 
   exact h1
 
 theorem weierstrassLog_eq_substInv : lgS g2 g3 = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) := eq_substInv_of_rightInverse g2 g3 (lgS g2 g3) (lgS_const g2 g3) (uSer_subst_lgS g2 g3)
-
-theorem lgS_subst_uSer : (lgS g2 g3).subst (uSer g2 g3) = X := by
-  rw [weierstrassLog_eq_substInv]
-  exact PowerSeries.subst_substInvOfIsUnit_left _ (uSer_const g2 g3) _
 
 theorem lgS_unique (t : PowerSeries K) (ht : constantCoeff t = 0) (h : (uSer g2 g3).subst t = X) :
     t = lgS g2 g3 := by
@@ -91,13 +67,6 @@ theorem mult_const (b : K) : constantCoeff ((uSer g2 g3).subst (C b * lgS g2 g3)
   · simp [uSer_const]
   · intro d hd
     simp [map_pow, hs, zero_pow hd]
-theorem mult_log (b : K) :
-    (lgS g2 g3).subst ((uSer g2 g3).subst (C b * lgS g2 g3)) = C b * lgS g2 g3 := by
-  have hu := HasSubst.of_constantCoeff_zero (uSer_const g2 g3)
-  have ha := HasSubst.of_constantCoeff_zero (constantCoeff_C_mul_weierstrassLog g2 g3 b)
-  have h1 := PowerSeries.subst_comp_subst_apply hu ha (lgS g2 g3)
-  rw [lgS_subst_uSer, PowerSeries.subst_X ha] at h1
-  exact h1.symm
 theorem mult_unique (b : K) (e : PowerSeries K) (he : constantCoeff e = 0)
     (h : (lgS g2 g3).subst e = C b * lgS g2 g3) : e = (uSer g2 g3).subst (C b * lgS g2 g3) := by
   have hl := HasSubst.of_constantCoeff_zero (lgS_const g2 g3)
@@ -105,14 +74,6 @@ theorem mult_unique (b : K) (e : PowerSeries K) (he : constantCoeff e = 0)
   have h1 := PowerSeries.subst_comp_subst_apply hl hE (uSer g2 g3)
   rw [uSer_subst_lgS, PowerSeries.subst_X hE, h] at h1
   exact h1
-
-theorem ltLog_const (l : ℕ) (hl : 2 ≤ l) : constantCoeff (ltLog K l) = 0 := by
-  first | unfold Formalism.L2.Th1.CM.ltLog
-  rw [← coeff_zero_eq_constantCoeff_apply, coeff_mk, dite_eq_right]
-  rintro ⟨j, hj⟩
-  have h0 : 0 < (l ^ 2) ^ j := pow_pos (pow_pos (by omega) 2) j
-  rw [← hj] at h0
-  exact lt_irrefl 0 h0
 
 end Field
 
@@ -195,13 +156,6 @@ theorem mult_map (b : K) :
     PowerSeries.map φ ((uSer g2 g3).subst (C b * lgS g2 g3))
       = (uSer (φ g2) (φ g3)).subst (C (φ b) * lgS (φ g2) (φ g3)) := by
   rw [map_subst_ps φ (constantCoeff_C_mul_weierstrassLog g2 g3 b), uSer_map, map_mul, map_C, lgS_map]
-
-theorem lt_map (l : ℕ) (hl : 2 ≤ l) (ε : K) :
-    PowerSeries.map φ ((uSer g2 g3).subst (C ε * ltLog K l))
-      = (uSer (φ g2) (φ g3)).subst (C (φ ε) * ltLog L l) := by
-  have h0 : constantCoeff (C ε * ltLog K l) = 0 := by
-    rw [map_mul, constantCoeff_C, ltLog_const l hl, mul_zero]
-  rw [map_subst_ps φ h0, uSer_map, map_mul, map_C, ltLog_map]
 
 end Map
 
