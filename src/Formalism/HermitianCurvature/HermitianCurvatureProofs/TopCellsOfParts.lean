@@ -126,32 +126,6 @@ theorem continuous_subS {p : ℕ} : Continuous (subS (p := p)) := by
   · simp only [dite_eq_right h]
     exact continuous_const
 
-theorem continuous_supS {p : ℕ} : Continuous (supS (p := p)) := by
-  show Continuous fun l : Matrix (Fin p) (Fin p) ℂ => supS l
-  unfold supS
-  refine continuous_finsetSum _ fun i _ => ?_
-  by_cases h : i.val + 1 < p
-  · simp only [dite_eq_left h]
-    exact continuous_id.matrix_elem _ _
-  · simp only [dite_eq_right h]
-    exact continuous_const
-
-theorem continuous_cornerA {p s : ℕ} : Continuous (cornerA (p := p) (s := s)) := by
-  show Continuous fun a : Fin s → Fin p → ℂ => cornerA a
-  by_cases h : 0 < s ∧ 0 < p
-  · simp only [cornerA, dite_eq_left h]
-    exact continuous_apply_apply _ _
-  · simp only [cornerA, dite_eq_right h]
-    exact continuous_const
-
-theorem continuous_cornerB {p s : ℕ} : Continuous (cornerB (p := p) (s := s)) := by
-  show Continuous fun b : Fin p → Fin s → ℂ => cornerB b
-  by_cases h : 0 < s ∧ 0 < p
-  · simp only [cornerB, dite_eq_left h]
-    exact continuous_apply_apply _ _
-  · simp only [cornerB, dite_eq_right h]
-    exact continuous_const
-
 theorem continuous_psiH {p s : ℕ} (β : ℂ) (σ : Equiv.Perm (Fin p)) :
     Continuous fun η : XiH p s σ => psiH β σ η := by
   apply _root_.Formalism.FourierDecayAlt.P.Ux10.cont_psiH <;> assumption

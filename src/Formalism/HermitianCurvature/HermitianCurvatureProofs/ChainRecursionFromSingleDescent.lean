@@ -292,11 +292,6 @@ theorem skip_two_comp_skip_one {n : ℕ} : ∀ {t : ℕ} (v : Fin (t + 1) → Fi
     simp only [Function.comp] at h3 ⊢
     rw [h3, h4]
 
-section full
-variable {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A)
-
-end full
-
 end
 
 section
@@ -350,7 +345,6 @@ theorem Good.map_add {T : X → X} (h : H.Good T) {x y : X} (hx : x ∈ H.G) (hy
   simpa only [one_smul] using h.lin x hx y hy 1
 
 variable (H)
-
 
 open Classical in
 def hat (T : X → X) : Module.End ℂ H.V :=
@@ -1002,7 +996,6 @@ theorem fam_diff {Φ : Fn k r (Wq →L[ℂ] Wp)} (h : FamFF k r z z' π π' L Dc
   have hev : ∀ᶠ c' in 𝓝 c, ((c', g) : (Fin r → ℂ) × Mx k r) ∈ U := hcont.continuousAt.eventually_mem (hU.mem_nhds hxU)
   exact hev.mono fun c' hc' => hFe (c', g) hc' hg
 
-
 variable (z z' π π') in
 def RS (L : Fin (r + 1)) (Dc Dc₀ : (Fin r → ℂ) → Set (Mx k r)) (S : Set (Fin r → ℂ))
     (Φ Ψ : Fn k r (Wq →L[ℂ] Wp)) : Prop :=
@@ -1216,7 +1209,6 @@ theorem step_fam (hCS : ChainStep) (hR : ResMem) (hFO : FamOps) (hTP : TPreserve
     exact hgD
   exact (hCS Wp Wq k r z z' π π' l D' Y a b hz hz' hdom' (Φ c₀) hJ₀ c₀ hc₀ g hg hgD').symm
 
-
 variable (z z' π π') in
 def RK (D : Set (Mx k r)) (l : Fin r) (Φ Ψ : Fn k r (Wq →L[ℂ] Wp)) : Prop :=
   FamFF k r z z' π π' l.castSucc (Dcell D l.castSucc) Φ ∧ Ind l.val Φ ∧
@@ -1333,16 +1325,6 @@ theorem dom_left (hD : IsDom k r z z' i D) {g : Mx k r} (hg : g ∈ Glev k r i �
   have := hD.2 g hg (1 * n) ⟨1, one_uw z, n, hn, rfl⟩ (1 * 1) ⟨1, one_uw z', 1, one_nlev i, rfl⟩
   exact ⟨Qx3.glev_mul hn.2 hg.1, by simpa using this⟩
 
-theorem dom_right (hD : IsDom k r z z' i D) {g : Mx k r} (hg : g ∈ Glev k r i ∩ D) {n : Mx k r}
-    (hn : n ∈ Nlev k r i) : g * n ∈ Glev k r i ∩ D := by
-  have := hD.2 g hg (1 * 1) ⟨1, one_uw z, 1, one_nlev i, rfl⟩ (1 * n) ⟨1, one_uw z', n, hn, rfl⟩
-  exact ⟨Qx3.glev_mul hg.1 hn.2, by simpa using this⟩
-
-theorem dom_uw (hD : IsDom k r z z' i D) {g : Mx k r} (hg : g ∈ Glev k r i ∩ D) {h h' : Mx k r}
-    (hh : h ∈ UWset k r z) (hh' : h' ∈ UWset k r z') : h * g * h' ∈ Glev k r i ∩ D := by
-  have := hD.2 g hg (h * 1) ⟨h, hh, 1, one_nlev i, rfl⟩ (h' * 1) ⟨h', hh', 1, one_nlev i, rfl⟩
-  exact ⟨Qx3.glev_mul (Qx3.glev_mul (Qx3.uw_glev i hh) hg.1) (Qx3.uw_glev i hh'), by simpa using this⟩
-
 theorem smooth_congr {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (hD : IsOpen D) {f f' : Mx k r → E}
     (h : SmoothLev k r i D f) (he : ∀ g ∈ Glev k r i ∩ D, f' g = f g) : SmoothLev k r i D f' := by
   intro g₀ hg₀
@@ -1354,7 +1336,6 @@ end Dom
 
 section Cut
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {L : Fin (r + 1)} {Dc : (Fin r → ℂ) → Set (Mx k r)}
-
 
 open Classical in
 def cutP (L : Fin (r + 1)) (Dc : (Fin r → ℂ) → Set (Mx k r)) : Fn k r E →ₗ[ℂ] Fn k r E where
@@ -1412,7 +1393,6 @@ theorem fam_congr (hS : SData z z' L Dc Dc (OmX r)) {Φ Ψ : Fn k r (Wq →L[ℂ
     FamFF k r z z' π π' L Dc Ψ :=
   ⟨Qx3.sf_congr_on hS.o (fun _ hx => hx) (fun x hx hxG => he x.1 hx.1 x.2 hxG hx.2) h.1,
     fun c hc => ff_congr (hS.d c hc) (h.2 c hc) (fun g hg => he c hc g hg.1 hg.2)⟩
-
 
 variable (π π') in
 def famData (hS : SData z z' L Dc Dc (OmX r)) : HatData (Fn k r (Wq →L[ℂ] Wp)) :=

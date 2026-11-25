@@ -74,7 +74,6 @@ def sd {m : ℕ} (i : Fin m) : Pr (m + 1) := ⟨(i.castSucc, i.succ), Fin.castSu
 def g1 {m : ℕ} (D' : K) (x : Fin m → K) (y : Pr (m + 1) → K) : K :=
   x0 D' x * ∑ i : Fin m, y (sd i) * Ring.inverse (xt D' x i.castSucc) * Ring.inverse (xt D' x i.succ)
 
-
 open Classical in
 def GG (R : Subring K) (ψ : AddChar K ℂ) (Φ : ∀ n : ℕ, Matrix (Fin n) (Fin n) K → ℂ) {m : ℕ} (D' : K)
     (x : Fin m → K) (y : Pr (m + 1) → K) : ℂ :=
@@ -2777,14 +2776,6 @@ theorem fa_sub_mul {n : ℕ} (A r : Matrix (Fin n) (Fin n) K) :
     (A * r).submatrix Fin.rev id = 1 * A.submatrix Fin.rev id * r := by
   ext i j
   simp [Matrix.mul_apply]
-
-theorem fa_sUp {m : ℕ} (u : Matrix (Fin (m + 1)) (Fin (m + 1)) K) :
-    sUp u = ∑ i : Fin m, u i.castSucc i.succ := by
-  unfold sUp
-  rw [Fin.sum_univ_castSucc]
-  simp only [Fin.val_last, lt_self_iff_false, dite_false, add_zero, Fin.val_castSucc,
-    add_lt_add_iff_right, Fin.is_lt, dite_true]
-  rfl
 
 theorem fa_smul_EE {n : ℕ} (z : K) (N : Pr n → K) :
     z • (1 + EE N) = HH 0 (fun _ => z) (z • N) := by

@@ -23,14 +23,6 @@ noncomputable section
 section PartDefs
 open Matrix MeasureTheory
 
-namespace Formalism.FourierDecayAlt.P.SliceLastLevel
-
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
-
-open scoped Matrix.Norms.Elementwise
-
-end Formalism.FourierDecayAlt.P.SliceLastLevel
-
 end PartDefs
 
 section PartSz
@@ -69,12 +61,6 @@ variable {k r : ℕ}
 lemma tr_gN_nonneg (g : B.Mat k r) : 0 ≤ B.gN g := Real.sqrt_nonneg _
 
 lemma gN_mul_le (X X' : B.Mat k r) : B.gN (X * X') ≤ B.gN X * B.gN X' := P.B6.gN_mul_le X X'
-
-lemma tr_inv_GV {n : B.Mat k r} (hn : n ∈ B.GV k r) : n⁻¹ = Hpk k r * nᴴ * Hpk k r := by
-  apply Matrix.inv_eq_left_inv
-  have h : nᴴ * Hpk k r * n = Hpk k r := hn
-  calc Hpk k r * nᴴ * Hpk k r * n = Hpk k r * (nᴴ * Hpk k r * n) := by simp only [Matrix.mul_assoc]
-    _ = 1 := by rw [h, (hpkFacts k r).2.1]
 
 lemma gN_inv_GV {n : B.Mat k r} (hn : n ∈ B.GV k r) : B.gN n⁻¹ = B.gN n := by
   apply _root_.PI.PolynomialProperness.GN.gN_inv <;> assumption
@@ -269,18 +255,6 @@ namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 open scoped Matrix.Norms.Elementwise
-
-section cdmap
-
-variable {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
-
-end cdmap
-
-section cdmap2
-
-variable {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
-
-end cdmap2
 
 section cdmap3
 

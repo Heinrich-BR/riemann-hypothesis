@@ -27,10 +27,6 @@ section lev
 
 variable {k : ℕ}
 
-theorem hpk_levPos_gen (o ρ : ℕ) (i j : Fin (2 * ρ + k + 1)) :
-    Hpk k (o + ρ) (levPos k o ρ i) (levPos k o ρ j) = Hpk k ρ i j := by
-  apply _root_.QnGlevImageW.hpk_shift <;> assumption
-
 theorem herm_lift_gen (o ρ : ℕ) (y y' : Fin (2 * ρ + k + 1) → ℂ) :
     herm (Hpk k (o + ρ)) (liftVec k o ρ y) (liftVec k o ρ y') = herm (Hpk k ρ) y y' := by
   apply _root_.PI.QnLevBasicsW.herm_lift <;> assumption
@@ -44,15 +40,6 @@ theorem liftVec_inj (o ρ : ℕ) {v w : Fin (2 * ρ + k + 1) → ℂ} (h : liftV
 
 theorem mulVec_bvec_apply {m : ℕ} (G : Matrix (Fin m) (Fin m) ℂ) (q p : Fin m) : (G *ᵥ bvec q) p = G p q := by
   simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
-
-theorem herm_bvec_r {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (v : Fin m → ℂ) (p : Fin m) :
-    herm H v (bvec p) = ∑ x, H p x * v x := by
-  simp only [herm, bvec, Matrix.mulVec, dotProduct]
-  rw [Finset.sum_eq_single p]
-  · simp
-  · intro b _ hb
-    simp [hb]
-  · simp
 
 def midB (o ρ : ℕ) (G : B.Mat k (o + ρ)) : B.Mat k ρ := fun a b => G (levPos k o ρ a) (levPos k o ρ b)
 

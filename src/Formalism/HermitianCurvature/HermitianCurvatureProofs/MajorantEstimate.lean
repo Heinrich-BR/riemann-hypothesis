@@ -33,32 +33,6 @@ lemma herm_ff {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (a b : Fin (r 
     · subst hab; simp [ha]
     · simp [ha, hab]
 
-lemma E_cast {n : ℕ} (x : Fin n → ℂ) : star x ⬝ᵥ x = ((∑ i, Complex.normSq (x i) : ℝ) : ℂ) := by
-  rw [dotProduct]
-  push_cast
-  refine Finset.sum_congr rfl fun i _ => ?_
-  rw [Complex.normSq_eq_conj_mul_self]
-  rfl
-
-lemma E_unit {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (hH : Hᴴ = H) (hH2 : H * H = 1) (v : Fin n → ℂ) :
-    ∑ i, Complex.normSq ((H *ᵥ v) i) = ∑ i, Complex.normSq (v i) := by
-  apply Complex.ofReal_injective
-  rw [← E_cast (H *ᵥ v), ← E_cast v, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
-    Matrix.mulVec_mulVec, hH, hH2, Matrix.one_mulVec]
-
-lemma euclid_cs {n : ℕ} (a b : Fin n → ℂ) :
-    Complex.normSq (star b ⬝ᵥ a) ≤ (∑ i, Complex.normSq (a i)) * (∑ i, Complex.normSq (b i)) := by
-  have h1 : ‖star b ⬝ᵥ a‖ ≤ ∑ i, ‖b i‖ * ‖a i‖ := by
-    rw [dotProduct]
-    refine (norm_sum_le _ _).trans (le_of_eq ?_)
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [norm_mul, Pi.star_apply, norm_star]
-  have h2 := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun i => ‖b i‖) (fun i => ‖a i‖)
-  simp only [Complex.normSq_eq_norm_sq]
-  calc ‖star b ⬝ᵥ a‖ ^ 2 ≤ (∑ i, ‖b i‖ * ‖a i‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) h1 2
-    _ ≤ (∑ i, ‖b i‖ ^ 2) * (∑ i, ‖a i‖ ^ 2) := h2
-    _ = (∑ i, ‖a i‖ ^ 2) * (∑ i, ‖b i‖ ^ 2) := mul_comm _ _
-
 lemma Hpk_mul_apply (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j : Fin (2 * r + k + 1)) :
     (Hpk k r * M) i j = GBasic.sgn k r i * M (GBasic.sig k r i) j := by
   rw [Matrix.mul_apply]
@@ -73,10 +47,6 @@ lemma mul_Hpk_apply (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     intro h
     exact hl (by rw [h, GBasic.sig_sig])
   · simp
-
-lemma normSq_sgn (i : Fin (2 * r + k + 1)) : Complex.normSq (GBasic.sgn k r i) = 1 := by
-  unfold GBasic.sgn
-  split_ifs <;> simp
 
 end C2x6
 
@@ -103,25 +73,6 @@ theorem gram_block_form : C2.GramBlocks := by
   · simp only [gramM, gramVec, Matrix.fromBlocks_apply₂₂]
     rw [hpres]
     exact herm_ff hz'.1 a b
-
-theorem majorant_estimate : C2.Majorant := by
-  intro k r
-  have hH := GBasic.Hpk_herm k r
-  have hsq := GBasic.Hpk_sq k r
-  refine ⟨?_, hsq, fun v => ⟨?_, ?_⟩⟩
-  · show (Hpk k r)ᴴ * Hpk k r * Hpk k r = Hpk k r
-    rw [hH, hsq, Matrix.one_mul]
-  · simp only [herm]
-    rw [E_cast, E_unit _ hH hsq]
-  · have hcs := euclid_cs (Hpk k r *ᵥ v) v
-    rw [E_unit _ hH hsq] at hcs
-    set S := ∑ i, Complex.normSq (v i)
-    have hS : 0 ≤ S := Finset.sum_nonneg fun i _ => Complex.normSq_nonneg _
-    have h1 : ‖herm (Hpk k r) v v‖ ^ 2 ≤ S ^ 2 := by
-      rw [← Complex.normSq_eq_norm_sq, sq]
-      exact hcs
-    have h2 : ‖herm (Hpk k r) v v‖ ≤ S := (pow_le_pow_iff_left₀ (norm_nonneg _) hS two_ne_zero).mp h1
-    exact (Complex.re_le_norm _).trans h2
 
 theorem norm_of_inverse : C2.NormInv := by
   apply _root_.PI.PolynomialProperness.GN.polynomial_normInv <;> assumption

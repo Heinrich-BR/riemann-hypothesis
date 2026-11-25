@@ -29,17 +29,6 @@ def MarkovVector : Prop :=
 
 def Bdd {Λ : Type} (f : Λ → ℂ) : Prop := ∃ B : ℝ, ∀ x, ‖f x‖ ≤ B
 
-def MeanPosDef : Prop :=
-  ∀ (Λ : Type) [AddCommGroup Λ] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (LIM : (Λ → ℂ) → ℂ),
-    (∀ f g, Bdd f → Bdd g → LIM (f + g) = LIM f + LIM g) →
-    (∀ (c : ℂ) f, Bdd f → LIM (c • f) = c * LIM f) →
-    (∀ f, Bdd f → (∀ x, 0 ≤ (f x).re ∧ (f x).im = 0) → 0 ≤ (LIM f).re) →
-    (∀ f (σ : Λ), Bdd f → LIM (fun x => f (x + σ)) = LIM f) →
-    ∀ (u : Λ → H) (B : ℝ), (∀ x, ‖u x‖ ≤ B) → ∀ (S : Finset Λ) (c : Λ → ℂ),
-      0 ≤ (∑ σ ∈ S, ∑ σ' ∈ S,
-        LIM (fun x => inner ℂ (u x) (u (x + (σ - σ')))) * c σ * starRingEnd ℂ (c σ')).re
-
 def HerglotzLSC : Prop :=
   ∀ (d : ℕ) (N : (Fin d → ℝ) → ℝ) (A : (Fin d → ℤ) → ℂ),
     (∀ z, 0 ≤ N z) → LowerSemicontinuous N → Integrable N →

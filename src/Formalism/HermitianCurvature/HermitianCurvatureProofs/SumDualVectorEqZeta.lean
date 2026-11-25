@@ -101,13 +101,6 @@ theorem hpart2_lie (Z : Mx k r) :
 def inV (k r : ℕ) (i : Fin (r + 1)) (p : Fin (2 * r + k + 1)) : Prop :=
   i.val ≤ p.val ∧ p.val + i.val ≤ 2 * r + k
 
-theorem inV_posL (i : Fin (r + 1)) (j : Fin (mdim k r i)) : inV k r i (posL k r i j) := by
-  have h1 := j.isLt
-  have h2 := i.isLt
-  unfold mdim at h1
-  show i.val ≤ j.val + i.val ∧ j.val + i.val + i.val ≤ 2 * r + k
-  omega
-
 theorem posL_inj (i : Fin (r + 1)) : Function.Injective (posL k r i) := by
   intro a b e
   apply Fin.ext
@@ -130,41 +123,11 @@ theorem hpk_out {i : Fin (r + 1)} {a p : Fin (2 * r + k + 1)} (ha : inV k r i a)
   simp only [Hpk]
   split_ifs with h1 h2 h3 <;> simp_all <;> omega
 
-theorem not_inV_eI {i : Fin (r + 1)} {a : Fin r} (ha : a.val < i.val) : ¬ inV k r i (eI k r a) := by
-  intro h
-  unfold inV at h
-  have h1 := h.1
-  change i.val ≤ a.val at h1
-  omega
-
-theorem not_inV_esI {i : Fin (r + 1)} {a : Fin r} (ha : a.val < i.val) : ¬ inV k r i (esI k r a) := by
-  intro h
-  unfold inV at h
-  have h1 := h.2
-  change 2 * r + k - a.val + i.val ≤ 2 * r + k at h1
-  have := a.isLt
-  omega
-
 theorem unit_col {i : Fin (r + 1)} {a b p : Fin (2 * r + k + 1)} (hb : inV k r i b) (hp : ¬ inV k r i p) :
     (Matrix.single a b (1 : ℂ) : Mx k r) *ᵥ bvec p = 0 := by
   have hbp : b ≠ p := fun e => hp (e ▸ hb)
   ext q
   simp [bvec, Matrix.mulVec, dotProduct, Matrix.single_apply, Pi.single_apply, hbp]
-
-theorem unit_col' {i : Fin (r + 1)} {a b p : Fin (2 * r + k + 1)} (ha : inV k r i a) (hp : ¬ inV k r i p) :
-    (Hpk k r * (Matrix.single a b (1 : ℂ) : Mx k r)ᴴ * Hpk k r) *ᵥ bvec p = 0 := by
-  have h0 : Hpk k r a p = 0 := hpk_out ha hp
-  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
-  have h1 : (Matrix.single a b (1 : ℂ) : Mx k r)ᴴ *ᵥ (Hpk k r *ᵥ bvec p) = 0 := by
-    ext q
-    simp [Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, Matrix.single_apply, bvec,
-      Pi.single_apply]
-    refine Finset.sum_eq_zero fun c _ => ?_
-    split_ifs with hc
-    · rw [← hc.1]
-      exact h0
-    · rfl
-  rw [h1, Matrix.mulVec_zero]
 
 theorem hpart_lev (i : Fin (r + 1)) (a b : Fin (mdim k r i)) :
     inLieLev k r i (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) ∧
@@ -835,7 +798,6 @@ theorem capelli_two_polynomial (hD : IsOpen D) {f : Mx k r → E} (hf : SmoothLe
     exact (qminor_poly' hD hf hx (skip2 p p') (skip2 q q') s).smul _
   · simp only [ite_eq_right hc]
     exact polyAt_zero _
-
 
 open Classical in
 def coefOf (N : ℕ) (φ : ℂ → E) : ℕ → E := if h : PolyAt N φ then h.choose else 0

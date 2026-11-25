@@ -45,36 +45,8 @@ theorem wl_fixv (c : Fin r → ℂ) (L : List (Fin r)) (v : Fin (2 * r + k + 1) 
   | cons b L ih =>
     rw [List.map_cons, List.prod_cons, ← Matrix.mulVec_mulVec, ih, w1_mulVec_eq_self_of_eI_esI_eq_zero b _ v (hv b).1 (hv b).2]
 
-theorem wl_es (c : Fin r → ℂ) (L : List (Fin r)) (hL : L.Nodup) (a : Fin r) :
-    (L.map fun b => Q.w1 k r b (c b)).prod *ᵥ bvec (esI k r a) =
-      if a ∈ L then (star (c a))⁻¹ • bvec (eI k r a) else bvec (esI k r a) := by
-  induction L with
-  | nil => simp
-  | cons b L ih =>
-    rw [List.nodup_cons] at hL
-    rw [List.map_cons, List.prod_cons, ← Matrix.mulVec_mulVec, ih hL.2]
-    by_cases hab : a = b
-    · subst hab
-      rw [ite_eq_right hL.1, Formalism.FourierDecayAlt.P.Qx6.reflection_maps_last_to_first_vector, ite_eq_left List.mem_cons_self]
-    · have hmem : (a ∈ b :: L) ↔ a ∈ L := by simp [hab]
-      by_cases h1 : a ∈ L
-      · rw [ite_eq_left h1, ite_eq_left (hmem.2 h1), Matrix.mulVec_smul, Formalism.FourierDecayAlt.P.Qx3.reflection_fixes_basis_vector b _
-          (fun h => hab (eI_inj h)) (fun h => _root_.Formalism.FourierDecayAlt.P.Dx2.DF.eI_ne_esI a b h)]
-      · rw [ite_eq_right h1, ite_eq_right (fun h => h1 (hmem.1 h)), Formalism.FourierDecayAlt.P.Qx3.reflection_fixes_basis_vector b _
-          (fun h => _root_.Formalism.FourierDecayAlt.P.Dx2.DF.eI_ne_esI b a h.symm) (fun h => hab (esI_inj h))]
-
 theorem wc_list (c : Fin r → ℂ) : Q.wCell k r (Fin.last r) c =
     (((List.finRange r).filter fun a => a.val < (Fin.last r).val).map fun a => Q.w1 k r a (c a)).prod := rfl
-
-theorem wc_nodup : ((List.finRange r).filter fun a : Fin r => a.val < (Fin.last r).val).Nodup :=
-  (List.nodup_finRange r).filter _
-
-theorem wc_mem (a : Fin r) : a ∈ ((List.finRange r).filter fun a : Fin r => a.val < (Fin.last r).val) := by
-  rw [List.mem_filter]; exact ⟨List.mem_finRange a, by simp [a.isLt]⟩
-
-theorem W_es (c : Fin r → ℂ) (a : Fin r) :
-    Q.wCell k r (Fin.last r) c *ᵥ bvec (esI k r a) = (star (c a))⁻¹ • bvec (eI k r a) := by
-  rw [wc_list, wl_es c _ wc_nodup, ite_eq_left (wc_mem a)]
 
 theorem W_fix (c : Fin r → ℂ) (v : Fin (2 * r + k + 1) → ℂ) (hv : ∀ b, v (eI k r b) = 0 ∧ v (esI k r b) = 0) :
     Q.wCell k r (Fin.last r) c *ᵥ v = v := by

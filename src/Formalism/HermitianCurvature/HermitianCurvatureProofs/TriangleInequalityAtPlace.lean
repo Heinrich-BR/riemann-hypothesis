@@ -16,15 +16,6 @@ open scoped ENNReal
 
 noncomputable section
 
-open Classical in
-theorem choose_dite_congr {α E : Type*} [Zero E] (P Q : α → Prop) (hPQ : P = Q) (f g : α → E)
-    [Decidable (∃ θ, P θ)] [Decidable (∃ θ, Q θ)]
-    (hfg : ∀ θ, P θ → f θ = g θ) :
-    (if h : ∃ θ, P θ then f h.choose else 0) = (if h : ∃ θ, Q θ then g h.choose else 0) := by
-  subst hPQ
-  split_ifs with h1 <;> first | rfl | exact hfg _ h1.choose_spec
-
-
 theorem one_mem_UW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
     (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) ∈ UWset k r z := by
   simp only [UWset, Set.mem_setOf_eq]
@@ -59,7 +50,6 @@ theorem Gf_of_Zhat {k r : ℕ} (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k
 end
 
 end Formalism.FourierDecayAlt.P.TBBx2
-
 
 namespace Formalism.FourierDecayAlt.P.TBBx2
 
@@ -227,7 +217,6 @@ lemma cs_bound {n : ℕ} (a x : Fin n → ℝ) (ha : ∀ i, 0 ≤ a i) :
 end
 
 end Formalism.FourierDecayAlt.P.TBBx2.Tri
-
 
 namespace Formalism.FourierDecayAlt.P.TBBx2.Bp
 
