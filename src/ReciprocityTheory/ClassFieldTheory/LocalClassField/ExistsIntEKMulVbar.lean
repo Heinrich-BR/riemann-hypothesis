@@ -79,8 +79,6 @@ def vK (x : Kˣ) : ℤ := vOn p K ⟨ofK p K (Additive.ofMul x), ofK_mem p K _�
 
 def Ubar : Submodule ℤ (KbarMult p) := AddSubgroup.toIntSubmodule (vbar p).ker
 
-theorem mem_Ubar_iff (x : KbarMult p) : x ∈ Ubar p ↔ vbar p x = 0 := Iff.rfl
-
 def UK : Subgroup Kˣ where
   carrier := {x | ‖((x : K) : PadicAlgCl p)‖ = 1}
   one_mem' := by
@@ -110,7 +108,6 @@ theorem mem_subG_iff (σ : GK p K) : σ ∈ subG p K L ↔ ∀ x ∈ L, σ x = x
 def degLK : ℕ := (subG p K L).index
 
 abbrev GalLK : Type := GK p K ⧸ subG p K L
-
 
 variable {p K L} in
 def resGK (h : K ≤ L) : GK p L →* GK p K where
@@ -147,7 +144,6 @@ theorem resGK_continuous (h : K ≤ L) : Continuous (resGK h) := by
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Algebra.smul_def, map_mul, AlgEquiv.commutes]
   exact congrArg _ (Set.mem_iInter.1 hσ i)
-
 
 variable {p K L} in
 theorem subG_normal_of_stable (h : ∀ (σ : GK p K), ∀ x ∈ L, σ x ∈ L) : (subG p K L).Normal := by
@@ -221,9 +217,6 @@ def ubarT : TRep ℤ (GK p K) where
 
 scoped instance : DiscreteTopology (ubarT p K).V := inferInstanceAs (DiscreteTopology (Ubar p))
 
-def ubarIncl : Pair (ubarT p K) (kbarT p K) :=
-  Pair.ofMap (M := ubarT p K) (M' := kbarT p K) (Ubar p).subtype continuous_subtype_val (fun _ _ => rfl)
-
 def mkLin {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G'] {A : TRep ℤ G}
     {B : TRep ℤ G'} (f : A.V →+ B.V) : A.V →ₗ[ℤ] B.V where
   toFun := f
@@ -231,8 +224,6 @@ def mkLin {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSp
   map_smul' n x := by simp
 
 abbrev layer [(subG p K L).Normal] : TRep ℤ (GalLK p K L) := InflationRestrictionInvariants.invQ (kbarT p K) (subG p K L)
-
-abbrev layerInf [(subG p K L).Normal] : Pair (layer p K L) (kbarT p K) := InflationRestrictionInvariants.invP (kbarT p K) (subG p K L)
 
 abbrev layerU [(subG p K L).Normal] : TRep ℤ (GalLK p K L) := InflationRestrictionInvariants.invQ (ubarT p K) (subG p K L)
 
@@ -242,57 +233,7 @@ scoped instance [(subG p K L).Normal] : DiscreteTopology (layer p K L).V :=
 scoped instance [(subG p K L).Normal] : DiscreteTopology (layerU p K L).V :=
   (InflationRestrictionInvariants.invariants_isInvRep (ubarT p K) (subG p K L)).2.1.discreteTopology
 
-def layerUIncl [(subG p K L).Normal] : Pair (layerU p K L) (layer p K L) :=
-  Pair.ofMap (M := layerU p K L) (M' := layer p K L)
-    (mkLin (A := layerU p K L) (B := layer p K L)
-      { toFun := fun x => ⟨(ubarIncl p K).u x.1, fun g => congrArg (ubarIncl p K).u (x.2 g)⟩
-        map_zero' := rfl
-        map_add' := fun _ _ => rfl })
-    continuous_of_discreteTopology
-    (fun g x => by
-      induction g using QuotientGroup.induction_on with
-      | H σ => rfl)
-
-
-variable {p K} in
-def layerInfl {L L' : IntermediateField ℚ_[p] (PadicAlgCl p)} (h : L ≤ L') [(subG p K L).Normal]
-    [(subG p K L').Normal] : Pair (layer p K L) (layer p K L') where
-  φ := QuotientGroup.map (subG p K L') (subG p K L) (MonoidHom.id _) (fun _ hσ x hx => hσ x (h hx))
-  u := mkLin (A := layer p K L) (B := layer p K L')
-    { toFun := fun x => ⟨x.1, fun g => x.2 ⟨g.1, fun y hy => g.2 y (h hy)⟩⟩
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
-  φ_cont := (QuotientGroup.isOpenQuotientMap_mk.isQuotientMap.continuous_iff).2 continuous_quot_mk
-  u_cont := continuous_of_discreteTopology
-  equiv g m := by
-    induction g using QuotientGroup.induction_on with
-    | H σ => rfl
-
-
-open Classical in
-def vLayerMap [(subG p K L).Normal] : (layer p K L).V →+ ℤ :=
-  if h : ∃ f : (layer p K L).V →+ ℤ, ∀ x, (f x : ℝ) = eK p L * vbar p x.1 then h.choose else 0
-
-theorem vLayerMap_rho [(subG p K L).Normal] (g : GalLK p K L) (x : (layer p K L).V) :
-    vLayerMap p K L ((layer p K L).rho g x) = vLayerMap p K L x := by
-  induction g using QuotientGroup.induction_on with
-  | H σ =>
-    unfold vLayerMap
-    split_ifs with h
-    · apply Int.cast_injective (α := ℝ)
-      rw [h.choose_spec, h.choose_spec]
-      exact congrArg _ (vbar_kbarRep p K σ x.1)
-    · rfl
-
-def vLayer [(subG p K L).Normal] : Pair (layer p K L) (trivRep (GalLK p K L) ℤ) :=
-  Pair.ofMap (M := layer p K L) (M' := trivRep (GalLK p K L) ℤ)
-    (mkLin (A := layer p K L) (B := trivRep (GalLK p K L) ℤ) (vLayerMap p K L))
-    continuous_of_discreteTopology (fun g x => vLayerMap_rho p K L g x)
-
 abbrev Br : Type := (kbarT p K).H 2
-
-def BrLK [(subG p K L).Normal] : Submodule ℤ (Br p K) := LinearMap.range ((layerInf p K L).hom.H 2)
-
 
 variable {p K L} in
 def resPair (h : K ≤ L) : Pair (kbarT p K) (kbarT p L) where
@@ -302,10 +243,6 @@ def resPair (h : K ≤ L) : Pair (kbarT p K) (kbarT p L) where
   u_cont := continuous_id
   equiv _ _ := rfl
 
-
-variable {p K L} in
-def BrKer (h : K ≤ L) : Submodule ℤ (Br p K) := LinearMap.ker ((resPair h).hom.H 2)
-
 abbrev urT : TRep ℤ (GalLK p K (MaximalUnramifiedExtension p K)) := layer p K (MaximalUnramifiedExtension p K)
 
 def IsInv (f : (urT p K).H 2 →+ QZ) : Prop :=
@@ -314,10 +251,6 @@ def IsInv (f : (urT p K).H 2 →+ QZ) : Prop :=
     π.1 ∈ multOf p K → (eK p K : ℝ) * vbar p π.1 = 1 → IsLocallyConstant t →
     (∀ g, (m g : ℚ) = t (g 0) + t (g 1) - t (g 0 * g 1)) → (∀ g, z.1 g = m g • π) →
     f ((urT p K).coch.cls 2 z hz) = QuotientAddGroup.mk (t (frobLK p K (MaximalUnramifiedExtension p K)))
-
-
-open Classical in
-def invUr : (urT p K).H 2 →+ QZ := if h : ∃ f, IsInv p K f then h.choose else 0
 
 end
 
